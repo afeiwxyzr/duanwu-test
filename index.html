@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点击完成后显示底部图（350x485版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .image-container {
+            max-width: 350px;  /* 主容器宽度匹配图片宽度 */
+            margin: 0 auto;
+        }
+        .image-item {
+            margin-bottom: 15px;
+            cursor: pointer;
+            position: relative;
+            height: 485px;    /* 初始高度=缩略图/中间图高度（350x485） */
+            overflow: hidden;
+        }
+        .thumbnail, .middle-image {
+            width: 100%;       /* 宽度占满容器（350px） */
+            height: 485px;    /* 高度固定485px */
+            object-fit: cover; /* 保持比例裁切 */
+            border-radius: 8px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .thumbnail {
+            z-index: 2;       
+            transition: opacity 1s;  /* 缩略图消失时间1秒 */
+        }
+        .middle-image {
+            z-index: 1;       
+            opacity: 0;
+            transition: opacity 1s;  /* 中间图显示时间1秒 */
+            pointer-events: none;    
+        }
+        .full-image {
+            width: 100%;       /* 宽度占满容器（350px） */
+            height: 0;
+            object-fit: cover; 
+            border-radius: 8px;
+            position: relative;
+            top: 485px;       /* 位于中间图下方（高度485px） */
+            transition: height 0.5s ease-out;
+        }
+
+        /* 底部图片样式（初始隐藏） */
+        .bottom-image {
+            width: 350px;     /* 固定宽度350px */
+            height: 485px;    /* 固定高度485px */
+            object-fit: cover; 
+            border-radius: 8px; 
+            margin: 20px auto 0; 
+            display: none;    /* 初始隐藏 */
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div class="image-item">
+            <img src="thumb1.png" class="thumbnail" alt="缩略图1（350x485）">
+            <img src="middle1.png" class="middle-image" alt="中间图1（350x485）">
+            <img src="full1.png" class="full-image" alt="展开图1（350x485）">
+        </div>
+
+        <div class="image-item">
+            <img src="thumb2.png" class="thumbnail" alt="缩略图2（350x485）">
+            <img src="middle2.png" class="middle-image" alt="中间图2（350x485）">
+            <img src="full2.png" class="full-image" alt="展开图2（350x485）">
+        </div>
+
+        <div class="image-item">
+            <img src="thumb3.png" class="thumbnail" alt="缩略图3（350x485）">
+            <img src="middle3.png" class="middle-image" alt="中间图3（350x485）">
+            <img src="full3.png" class="full-image" alt="展开图3（350x485）">
+        </div>
+    </div>
+
+    <!-- 底部图片（350x485，初始隐藏） -->
+    <img src="结尾.png" class="bottom-image" alt="完成后显示的底部图（350x485）">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const middleImages = document.querySelectorAll('.middle-image');
+            const fullImages = document.querySelectorAll('.full-image');
+            const imageItems = document.querySelectorAll('.image-item');
+            const bottomImage = document.querySelector('.bottom-image');
+
+            // 初始化点击状态数组（长度3，对应3个缩略图）
+            const clickStates = new Array(thumbnails.length).fill(false);
+
+            thumbnails.forEach((thumb, index) => {
+                thumb.addEventListener('click', () => {
+                    // 避免重复点击
+                    if (clickStates[index]) return;
+
+                    // 执行交互：缩略图消失 + 中间图显示
+                    thumb.style.opacity = '0';       
+                    middleImages[index].style.opacity = '1';  
+
+                    // 1秒后展开下方大图（高度调整为485px）
+                    setTimeout(() => {
+                        fullImages[index].style.height = '485px';  /* 展开图高度485px */
+                        // 容器总高度=缩略图高度（485px） + 展开图高度（485px）=970px
+                        imageItems[index].style.height = '970px';  
+                    }, 1000);  
+
+                    // 更新点击状态
+                    clickStates[index] = true;
+
+                    // 所有缩略图点击完成后显示底部图
+                    const allClicked = clickStates.every(state => state === true);
+                    if (allClicked) {
+                        bottomImage.style.display = 'block';  /* 显示350x485底部图 */
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+    
